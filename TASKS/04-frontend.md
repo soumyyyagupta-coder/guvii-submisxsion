@@ -1,0 +1,3 @@
+# Session 4: React web interface
+
+Read `PLAN.md` and `API_CONTRACT.md` first. Implement only files under `frontend/`; do not edit any backend or planning files. Build a polished, responsive React + Vite web app for the contracted API. Include registration/login, profile editor (interests, skills, academic background, level, goal), recommendation list with score breakdown and reasons, catalog search/filters, saved courses, and admin catalog CRUD. Show sample-data badge for demo courses. Use an API helper with bearer token and 401 handling, Vite proxy, accessible form labels, loading/error/empty states, and no mocked results. Keep dependencies lean. Run `npm install` and `npm run build`. Write a short completion note to `TASKS/04-result.md`.

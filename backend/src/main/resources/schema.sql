@@ -1,0 +1,71 @@
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(120) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL,
+    academic_background VARCHAR(255),
+    proficiency_level VARCHAR(30),
+    career_goal VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS user_interests (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    interest_name VARCHAR(100) NOT NULL,
+    CONSTRAINT fk_user_interests_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS user_skills (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    skill_name VARCHAR(100) NOT NULL,
+    proficiency VARCHAR(30),
+    CONSTRAINT fk_user_skills_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS courses (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    category VARCHAR(100),
+    difficulty_level VARCHAR(30),
+    duration_hours INT,
+    platform VARCHAR(120),
+    course_url VARCHAR(500),
+    career_goals VARCHAR(500),
+    prerequisites VARCHAR(500),
+    is_demo BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE IF NOT EXISTS course_topics (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    course_id BIGINT NOT NULL,
+    topic_name VARCHAR(100) NOT NULL,
+    CONSTRAINT fk_course_topics_course FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS course_skills (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    course_id BIGINT NOT NULL,
+    skill_name VARCHAR(100) NOT NULL,
+    CONSTRAINT fk_course_skills_course FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS saved_courses (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    course_id BIGINT NOT NULL,
+    saved_at TIMESTAMP NOT NULL,
+    CONSTRAINT uk_saved_user_course UNIQUE (user_id, course_id),
+    CONSTRAINT fk_saved_courses_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_saved_courses_course FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    token_hash VARCHAR(64) NOT NULL UNIQUE,
+    expires_at TIMESTAMP NOT NULL,
+    CONSTRAINT fk_sessions_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

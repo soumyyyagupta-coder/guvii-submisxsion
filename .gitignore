@@ -1,0 +1,11 @@
+.env
+.env.*
+**/node_modules/
+**/dist/
+**/target/
+backend/data/
+**/*.mv.db
+**/*.lock.db
+**/__pycache__/
+preview.png
+*-preview.png
