@@ -11,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.List;
 
 @Component
@@ -304,7 +303,7 @@ public class DatabaseInitializer implements ApplicationRunner {
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection.prepareStatement(
                         "INSERT INTO courses (title, description, category, difficulty_level, duration_hours, platform, course_url, career_goals, prerequisites, is_demo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        Statement.RETURN_GENERATED_KEYS
+                        new String[]{"id"}
                 );
                 ps.setString(1, course.title());
                 ps.setString(2, course.description());

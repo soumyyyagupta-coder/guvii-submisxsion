@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -158,7 +157,7 @@ public class CatalogService {
 
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
             ps.setString(1, request.title().trim());
             ps.setString(2, request.description() != null ? request.description().trim() : "");
             ps.setString(3, request.category() != null ? request.category().trim() : "General");

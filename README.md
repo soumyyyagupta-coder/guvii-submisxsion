@@ -41,7 +41,7 @@ Set `COURSE_REC_API_BASE=http://localhost:10000/api` to run the same check again
 
 ## One-container Docker deployment
 
-The root [Dockerfile](Dockerfile) builds React, embeds its production files in the Spring Boot jar, and runs one Java process on Render's `PORT`. The jar includes the API, H2 and MySQL JDBC drivers, SQL schema, and code that seeds 14 demo courses. It does **not** copy `backend/data/` into the image; that local database contains development accounts and is excluded by `.dockerignore`.
+The root [Dockerfile](Dockerfile) builds React, embeds its production files in the Spring Boot jar, and installs PostgreSQL in the same container. The startup script initializes PostgreSQL, creates the database, then starts the Java/JDBC API on Render's `PORT`. PostgreSQL listens only on container loopback; users access the React app and API through the single web port. The jar includes the PostgreSQL JDBC driver, a PostgreSQL schema, and code that seeds 14 demo courses. It does **not** copy `backend/data/` into the image; that local H2 database contains development accounts and is excluded by `.dockerignore`.
 
 ```powershell
 docker build -t courserec-render .
@@ -54,7 +54,7 @@ Open `http://localhost:10000` and check `http://localhost:10000/api/health`. The
 
 The root [render.yaml](render.yaml) defines a single Docker web service on Render's Free plan. Put this project in a Git repository on GitHub or another Git provider supported by Render, then create a Render Blueprint from that repository. Render builds the Dockerfile and serves the app at its assigned `onrender.com` URL. The Blueprint health check is `/api/health`. Add `ADMIN_EMAIL` and `ADMIN_PASSWORD` in the Render dashboard if you need an admin login; keep these values out of source control.
 
-**Free-tier data limit:** Render Free web services lose filesystem changes whenever they spin down, restart, or redeploy. The 14 demo courses are recreated automatically, but registered users, profile changes, and bookmarks stored in the embedded H2 database are lost. Render Free web services cannot attach a persistent disk. Long-lived user data therefore needs a separate persistent database or a paid disk. Render's Free Postgres option currently expires after 30 days. See [Render's Free plan documentation](https://render.com/docs/free).
+**Free-tier data limit:** PostgreSQL runs inside the web service, so its data files are on Render Free's temporary filesystem. Render Free web services lose filesystem changes whenever they spin down, restart, or redeploy. The 14 demo courses are recreated automatically, but registered users, profile changes, and bookmarks are lost. Render Free web services cannot attach a persistent disk. Long-lived user data needs a separate persistent database or a paid disk. Render's separate Free Postgres option currently expires after 30 days. See [Render's Free plan documentation](https://render.com/docs/free).
 
 The existing MySQL JDBC profile can connect to an external MySQL database by setting `SPRING_PROFILES_ACTIVE=mysql` and the JDBC environment variables listed above; this is separate from the one-container demo setup.
 

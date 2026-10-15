@@ -14,16 +14,22 @@ COPY backend/src/ ./src/
 COPY --from=frontend-build /build/frontend/dist/ ./src/main/resources/static/
 RUN mvn -B -q -Dmaven.test.skip=true package
 
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:21-jre-noble
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends postgresql-16 \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=backend-build /build/backend/target/courserec-backend-0.0.1-SNAPSHOT.jar ./app.jar
-RUN useradd --system --uid 10001 --create-home appuser \
-    && mkdir -p /app/data \
-    && chown -R appuser:appuser /app
-USER appuser
+COPY docker/start.sh ./start.sh
+RUN chmod 755 /app/start.sh \
+    && mkdir -p /app/pgdata \
+    && chown postgres:postgres /app/pgdata
 
 ENV PORT=10000 \
-    JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=60.0 -XX:+UseSerialGC" \
+    JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=45.0 -XX:+UseSerialGC" \
+    SPRING_PROFILES_ACTIVE=postgres \
+    SPRING_DATASOURCE_URL=jdbc:postgresql://127.0.0.1:5432/courserec \
+    SPRING_DATASOURCE_USERNAME=postgres \
     SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=3
 EXPOSE 10000
-CMD ["sh", "-c", "exec java -jar /app/app.jar --server.port=${PORT}"]
+CMD ["/app/start.sh"]
